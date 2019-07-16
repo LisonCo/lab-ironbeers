@@ -1,0 +1,52 @@
+
+const express = require('express');
+const hbs     = require('hbs');
+const app     = express();
+const path    = require('path');
+const PunkAPIWrapper = require('punkapi-javascript-wrapper');
+const punkAPI = new PunkAPIWrapper();
+
+app.set('view engine', 'hbs');
+app.set('views', __dirname + '/views');
+app.use(express.static(path.join(__dirname, '/public')));
+hbs.registerPartials(__dirname + '/views/partials');
+
+// HOME PAGE
+app.get('/', (req, res, next) => {
+  res.render('index');
+});
+
+// BEERS PAGE
+app.get('/beers', (req, res, next) => {
+  punkAPI.getBeers()
+  .then(beers => {
+    res.render('beers', {beers});
+  })
+  .catch(error => {
+    console.log(error)
+  })
+});
+
+// RANDOM BEER PAGE
+app.get('/random-beer', (req, res, next) => {
+  punkAPI.getRandom()
+  .then(beers => {
+    res.render('randomBeer', {beers});
+  })
+  .catch(error => {
+    console.log(error)
+  }) 
+});
+
+// CLICK ON THE BEER IMAGE
+app.get('/beer/:id', (req, res, next) => {
+  punkAPI.getBeer(req.params.id)
+  .then(beers => {
+    res.render('randomBeer', {beers});
+  })
+  .catch(error => {
+    console.log(error)
+  }) 
+});
+
+app.listen(3000);
